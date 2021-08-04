@@ -52,6 +52,7 @@ objects = [circle(500,500,25,red,screen)]
 health=10
 objects.append(spawner(objects[0].x-50,objects[0].y,objects[0].x-50,0,10,1,5,white,True,9999,0))
 objects.append(spawner(objects[0].x+50,objects[0].y,objects[0].x+50,0,10,1,5,white,True,9999,0))
+iframes = 0
 # player stuff
 
 
@@ -76,6 +77,8 @@ controllable = True
 menucolor = (50,0,0)
 menutext = (169,169,169)
 while running:
+    if (iframes>1):
+        iframes-=1
     #(mousex,mousey) = mouse.get_pos()
     #ignore
     objects[1].startx=objects[0].x-50
@@ -130,11 +133,55 @@ while running:
         # makes sure the object will be seen
         z.rendered = True
         # means that its being rendered
-        z.display(camerax,cameray)
+        if (not z==objects[0]):
+            z.display(camerax,cameray)
+        else:
+            if controllable:
+                width1 = 0
+                height1 = 0
+                left = 0
+                right = 0
+                up = 0
+                down = 0
+                if z.type == 'Circle':
+                    width1 = z.r
+                    height1=z.r
+                    left = z.x-z.r
+                    right = z.x+z.r
+                    up = z.y-z.r
+                    down = z.y+z.r
+                elif z.type == 'Rect':
+                    width1=z.w
+                    height1=z.h
+                    left = z.x
+                    up = z.y
+                    down = z.y+z.h
+                    right = z.x+z.w
+                for q in keys:
+                        if q == 'a':
+                            objects[0].x-=width1
+                            if (left<=0):
+                                objects[0].x+=width1
+                        elif q == 'd':
+                            objects[0].x+=width1
+                            if (right>=effectivewidth):
+                                objects[0].x-=width1
+                        elif q == 's':
+                            objects[0].y+=height1
+                            if (down>=height):
+                                objects[0].y-=height1
+                        elif q == 'w':
+                            objects[0].y-=height1
+                            if (up<=0):
+                                objects[0].y+=height1
+            if (iframes==0 or not iframes%2==0):
+                z.display(camerax,cameray)
         if z.type == 'Bullet':
             if z.allegience==False:
                 if z.testcollision(objects[0]):
-                    health-=1
+                    if (not iframes):
+                        health-=1
+                        iframes=60
             if z.x==z.endx and z.y==z.endy:
                 objects.remove(z)
                 continue
@@ -148,44 +195,7 @@ while running:
             if z.amount==0:
                 objects.remove(z)
                 continue
-        if z == objects[0] and controllable:
-            width1 = 0
-            height1 = 0
-            left = 0
-            right = 0
-            up = 0
-            down = 0
-            if z.type == 'Circle':
-                width1 = z.r
-                height1=z.r
-                left = z.x-z.r
-                right = z.x+z.r
-                up = z.y-z.r
-                down = z.y+z.r
-            elif z.type == 'Rect':
-                width1=z.w
-                height1=z.h
-                left = z.x
-                up = z.y
-                down = z.y+z.h
-                right = z.x+z.w
-            for q in keys:
-                    if q == 'a':
-                        objects[0].x-=width1
-                        if (left<=0):
-                            objects[0].x+=width1
-                    elif q == 'd':
-                        objects[0].x+=width1
-                        if (right>=effectivewidth):
-                            objects[0].x-=width1
-                    elif q == 's':
-                        objects[0].y+=height1
-                        if (down>=height):
-                            objects[0].y-=height1
-                    elif q == 'w':
-                        objects[0].y-=height1
-                        if (up<=0):
-                            objects[0].y+=height1
+        
     # rendering stuff            
     pygame.draw.rect(screen,menucolor, pygame.Rect(effectivewidth,0,(width-effectivewidth),height))   
     healthsurface = font.render('Health:{}'.format(health), False, menutext)
