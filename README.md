@@ -7,9 +7,9 @@ to install pygame you need pip: https://pip.pypa.io/en/stable/installation/
 to install pygame just type in a command promp: pip install pygame
 
 other then that i would suggest use visual studio code or visual studio 2019
-https://code.visualstudio.com/
 
-https://visualstudio.microsoft.com/downloads/
+visual studio code: https://code.visualstudio.com/
+visual studio 2019: https://visualstudio.microsoft.com/downloads/
 
 once you have all that done just install git (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) then
 
