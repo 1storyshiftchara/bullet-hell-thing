@@ -5,6 +5,7 @@ print("start")
 import pygame
 import time
 import random
+from loadsprites import *
 from shapes import *
 # dont touch
 white = (255,255,255)
@@ -48,14 +49,14 @@ maps.append(mapthing)
 
 
 running = True
-objects = [circle(500,500,25,red,screen)]
+objects = [circle(500,500,25,black,screen)]
 health=10
 objects.append(spawner(objects[0].x-50,objects[0].y,objects[0].x-50,0,10,1,5,white,True,9999,0))
 objects.append(spawner(objects[0].x+50,objects[0].y,objects[0].x+50,0,10,1,5,white,True,9999,0))
 iframes = 0
 # player stuff
-
-
+images = [[0,loadimage("placeholder.png")]]
+charrotation = 0
 
 font = pygame.font.SysFont('martinaregular',30)
 global stage; stage = 0
@@ -195,7 +196,17 @@ while running:
             if z.amount==0:
                 objects.remove(z)
                 continue
-        
+    for z in images:
+        curob = objects[z[0]]
+        image = z[1]
+        xchange=-image.get_height()/2
+        ychange=-image.get_width()/2
+        if z[0]==0:
+            xchange=-50
+            ychange=-50
+            image = pygame.transform.rotate(image,charrotation)
+            image = pygame.transform.scale(image,(100,100))
+        screen.blit(image,(curob.x+xchange,curob.y+ychange))
     # rendering stuff            
     pygame.draw.rect(screen,menucolor, pygame.Rect(effectivewidth,0,(width-effectivewidth),height))   
     healthsurface = font.render('Health:{}'.format(health), False, menutext)
@@ -203,7 +214,7 @@ while running:
     screen.blit(healthsurface,(width-150,50))
     screen.blit(stagesurface,(width-150,300))
     # side menu
-                        
+    charrotation+=5              
     
     pygame.display.flip()
     screen.fill(fillcol)
