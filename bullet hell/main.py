@@ -1,3 +1,4 @@
+# run this file to run the game
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 print("start")
