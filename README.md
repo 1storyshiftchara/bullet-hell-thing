@@ -10,7 +10,7 @@ other then that i would suggest use visual studio code or visual studio 2019
 https://code.visualstudio.com/
 https://visualstudio.microsoft.com/downloads/
 
-once you have all that done just install git then
+once you have all that done just install git (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) then
 
 1. make a folder where you want the bullet hell engine to be
 2. cd into the folder in a command line promp (cd (file location))
