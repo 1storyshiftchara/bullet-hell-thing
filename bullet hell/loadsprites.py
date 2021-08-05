@@ -6,10 +6,13 @@ Imagefile = Curfile + "sprites"
 Imagefile = re.sub("/",r'\\',Imagefile)
 Imagefile += r'\''
 Imagefile = re.sub("'","",Imagefile)
+
 # yet its dumb no i dont know how to change it
-print("file: "+Curfile)
+
 print("images: "+Imagefile)
-def loadimage(name):
+
+def getimage(name):
+    # 
     try:
         image = pygame.image.load('{}{}'.format(Imagefile,name))
         return image

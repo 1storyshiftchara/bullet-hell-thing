@@ -5,6 +5,7 @@ print("start")
 import pygame
 import time
 import random
+
 from loadsprites import *
 from shapes import *
 # dont touch
@@ -46,38 +47,49 @@ maps.append(mapthing)
 #^ change this for changing when/how bullets appear
 # spawner(startx,starty,endx,endy,bulletspeed,delay between bullets,radius of bullets,color,is from player,amount of bullets,time to start firing)
 # put is from player to false for it to be able to damage the player
-
-
-running = True
+loadedimages = []
+images = []
+#image stuff
+# [object id to follow, image name]
 objects = [circle(500,500,25,black,screen)]
 health=10
 objects.append(spawner(objects[0].x-50,objects[0].y,objects[0].x-50,0,10,1,5,white,True,9999,0))
 objects.append(spawner(objects[0].x+50,objects[0].y,objects[0].x+50,0,10,1,5,white,True,9999,0))
+power = 0
+playerpos = [500,500]
+loadedimages.append(getimage("placeholder.png"))
+images.append([0,loadedimages[0]])
 iframes = 0
 # player stuff
-images = [[0,loadimage("placeholder.png")]]
 charrotation = 0
-
 font = pygame.font.SysFont('martinaregular',30)
 global stage; stage = 0
 def loadmap(map1):
-    global stage; stage = 1
+    objects.clear()
+    objects.append(circle(playerpos[0],playerpos[1],25,black,screen))
+    if power==0:
+        objects.append(spawner(objects[0].x-50,objects[0].y,objects[0].x-50,0,10,1,5,white,True,9999,0))
+        objects.append(spawner(objects[0].x+50,objects[0].y,objects[0].x+50,0,10,1,5,white,True,9999,0))
+    global stage; stage = maps.index(map1)
     global fillcol; fillcol = map1.background
     global localticks; localticks=0
     for thing in map1.data:
         objects.append(thing)
-loadmap(maps[0]) 
 # loads in maps 
+loadmap(maps[0]) 
+
 keys = []
-# stores keyd
+# all keys being pressed
 controllable = True
-# if its false the player cant move
-#mouse = pygame.mouse
+# controllability of the player
 
 
 menucolor = (50,0,0)
 menutext = (169,169,169)
+#menu stuff
+running = True
 while running:
+    playerpos = [objects[0].x,objects[0].y]
     if (iframes>1):
         iframes-=1
     #(mousex,mousey) = mouse.get_pos()
@@ -221,4 +233,5 @@ while running:
     time.sleep(0.06)
     localticks+=1
     globalticks+=1
+    
     # dont touch
