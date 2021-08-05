@@ -62,6 +62,8 @@ class circle(object):
         if changey==None:
             changey=0
         pygame.draw.circle(self.s, self.c, (self.x-changex,self.y-changey),self.r)
+        pygame.draw.circle(self.s, self.c, (self.x-changex,self.y-changey),self.r)
+        #stops stuff from becoming transparent
     def testcollision(self,other):
             if other.type == 'Rect':
                 # originally had circle-rect collision but the method didnt work

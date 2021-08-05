@@ -17,6 +17,8 @@ blue = (0,0,255)
 skyblue = (135,206,235)
 #colors
 
+
+
 pygame.init()
 pygame.font.init()
 #makes stuff work
@@ -37,11 +39,15 @@ effectivewidth = width-200
 # more window stuff
 maps = []
 mapthing = mapp([
-spawner(75,75,effectivewidth/2,height,10,5,25,blue,False,10,30),
-spawner(effectivewidth-75,75,effectivewidth/2,height,10,5,25,blue,False,10,30),
-spawner(effectivewidth/2,75,effectivewidth/2,height,10,2,50,blue,False,100,60),
-spawner(effectivewidth-75,75,effectivewidth/2,height,10,5,25,blue,False,10,140),
-spawner(75,75,effectivewidth/2,height,10,5,25,blue,False,10,140)]
+spawner(0,0,0,height,    35,10,25,black,False,300,0),
+spawner(200,0,200,height,35,10,25,black,False,300,0),
+spawner(400,0,400,height,35,10,25,black,False,300,0),
+spawner(600,0,600,height,35,10,25,black,False,300,0),
+spawner(100,0,100,height,35,10,25,white,False,300,5),
+spawner(300,0,300,height,35,10,25,white,False,300,5),
+spawner(500,0,500,height,35,10,25,white,False,300,5),
+spawner(700,0,700,height,35,10,25,white,False,300,5)
+]
 ,skyblue)
 maps.append(mapthing)
 #^ change this for changing when/how bullets appear
@@ -51,7 +57,7 @@ loadedimages = []
 images = []
 #image stuff
 # [object id to follow, image name]
-objects = [circle(500,500,25,black,screen)]
+objects = [circle(500,500,5,black,screen)]
 health=10
 objects.append(spawner(objects[0].x-50,objects[0].y,objects[0].x-50,0,10,1,5,white,True,9999,0))
 objects.append(spawner(objects[0].x+50,objects[0].y,objects[0].x+50,0,10,1,5,white,True,9999,0))
@@ -84,16 +90,27 @@ controllable = True
 # controllability of the player
 
 
+trailamount = 1
+#change this to change the amount of trail levels
+#i wouldnt reccomend that tho its kinda buggy
+trailsurfaces = []
+for x in range(trailamount):
+    trailsurfaces.append(pygame.Surface((effectivewidth,height)))
+    trailsurfaces[x].set_alpha(x+1*50)
+    print(trailsurfaces[x].get_alpha())
+# adds trails
+
 menucolor = (50,0,0)
 menutext = (169,169,169)
 #menu stuff
+bulletspeed = 5
+#other
 running = True
 while running:
     playerpos = [objects[0].x,objects[0].y]
-    if (iframes>1):
+    if (iframes>=1):
         iframes-=1
-    #(mousex,mousey) = mouse.get_pos()
-    #ignore
+    
     objects[1].startx=objects[0].x-50
     objects[2].startx=objects[0].x+50
     objects[1].endx=objects[0].x-50
@@ -125,6 +142,11 @@ while running:
                 keys.remove('mouse2')
     # controls and closing the game
     for z in objects:
+        if z.type == 'Spawner' and z.allegience==False:
+            z.startx=random.randint(0,effectivewidth)
+            z.endx=random.randint(0,effectivewidth)
+    #remove this its just part of the example
+    for z in objects:
         offsetx = camerax
         offsety = cameray
         
@@ -146,6 +168,39 @@ while running:
         # makes sure the object will be seen
         z.rendered = True
         # means that its being rendered
+        if z.type == 'Bullet':
+            if z.allegience==False:
+                if z.testcollision(objects[0]):
+                    if (not iframes):
+                        health-=1
+                        iframes=60
+            if z.x==z.endx and z.y==z.endy:
+                objects.remove(z)
+                continue
+            z.x+=-(z.startx-z.endx)/z.speed
+            z.y+=-(z.starty-z.endy)/z.speed
+            if trailamount>0:
+                loopamount=trailamount-1
+                while loopamount>=0:
+                    multiplier = 0
+                    if (loopamount!=0):
+                        multiplier=loopamount/2
+                    if z.x+(z.startx-z.endx)/(z.speed/(multiplier+2))==z.endx:
+                        loopamount-=1
+                        continue
+                    if z.y+(z.starty-z.endy)/(z.speed/(multiplier+2))==z.endy:
+                        loopamount-=1
+                        continue
+                    pygame.draw.circle(trailsurfaces[loopamount], (z.c), (z.x+(z.startx-z.endx)/(z.speed/(multiplier+2)),z.y+(z.starty-z.endy)/(z.speed/(multiplier+2))),z.r)
+                    loopamount-=1
+        elif z.type == 'Spawner':
+            if z.tick==localticks:
+                z.tick+=z.delay
+                z.amount-=1
+                objects.append(bullet(z.startx,z.starty,z.size,z.c,screen,z.endx,z.endy,z.speed,z.allegience))
+            if z.amount==0:
+                objects.remove(z)
+                continue
         if (not z==objects[0]):
             z.display(camerax,cameray)
         else:
@@ -187,40 +242,24 @@ while running:
                             objects[0].y-=height1
                             if (up<=0):
                                 objects[0].y+=height1
-            if (iframes==0 or not iframes%2==0):
-                z.display(camerax,cameray)
-        if z.type == 'Bullet':
-            if z.allegience==False:
-                if z.testcollision(objects[0]):
-                    if (not iframes):
-                        health-=1
-                        iframes=60
-            if z.x==z.endx and z.y==z.endy:
-                objects.remove(z)
-                continue
-            z.x+=(z.endx-z.startx)/z.speed
-            z.y+=(z.endy-z.starty)/z.speed
-        elif z.type == 'Spawner':
-            if z.tick==localticks:
-                z.tick+=z.delay
-                z.amount-=1
-                objects.append(bullet(z.startx,z.starty,z.size,z.c,screen,z.endx,z.endy,z.speed,z.allegience))
-            if z.amount==0:
-                objects.remove(z)
-                continue
     for z in images:
         curob = objects[z[0]]
         image = z[1]
         xchange=-image.get_height()/2
         ychange=-image.get_width()/2
         if z[0]==0:
-            xchange=-50
-            ychange=-50
-            image = pygame.transform.rotate(image,charrotation)
-            image = pygame.transform.scale(image,(100,100))
-        screen.blit(image,(curob.x+xchange,curob.y+ychange))
+            if (iframes==0 or  not iframes%2==0):
+                xchange=-25
+                ychange=-25
+                image = pygame.transform.rotate(image,charrotation)
+                image = pygame.transform.scale(image,(50,50))
+                screen.blit(image,(curob.x+xchange,curob.y+ychange))
+        else:
+            screen.blit(image,(curob.x+xchange,curob.y+ychange))
     # rendering stuff            
     pygame.draw.rect(screen,menucolor, pygame.Rect(effectivewidth,0,(width-effectivewidth),height))   
+    for x in trailsurfaces:
+        screen.blit(x,(0,0))
     healthsurface = font.render('Health:{}'.format(health), False, menutext)
     stagesurface = font.render('stage:{}'.format(stage), False, menutext)       
     screen.blit(healthsurface,(width-150,50))
@@ -230,6 +269,8 @@ while running:
     
     pygame.display.flip()
     screen.fill(fillcol)
+    for x in trailsurfaces:
+        x.fill(fillcol)
     time.sleep(0.06)
     localticks+=1
     globalticks+=1
